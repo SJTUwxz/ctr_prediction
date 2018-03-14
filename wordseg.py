@@ -6,6 +6,11 @@ import os.path
 import sys
 import re
 import jieba
+import framework as fw
+import pandas as pd
+        
+from pandas import Series, DataFrame
+
 # from importlib import reload
 
 # reload(sys)
@@ -43,11 +48,12 @@ if __name__ == '__main__':
   inp, outp = sys.argv[1:3]
   space = " "
   i = 0
-  f = open('./data/stopwords.txt.utf8','r')
+  f = open('../data/stopwords.txt.utf8','r')
   stopwords = [l.strip() for l in f.readlines()]
 
   finput = open(inp )
   foutput = open(outp,'w')
+  cleans = []
   for line in finput:
     line_seg = jieba.cut(reTest(line))
     new_line = []
@@ -55,13 +61,16 @@ if __name__ == '__main__':
         word = word.encode( 'utf-8') 
         if word not in stopwords:
             new_line.append(word) 
-        else:
-            print word
     foutput.write(space.join(new_line)) 
+    if len(new_line) != 0:
+      cleans.append(new_line) 
     i = i + 1
     if (i % 1000 == 0):
       logger.info("Saved " + str(i) + " articles_seg")
     foutput.write('\n')
+
+  cleans = pd.Series(cleans) 
+  print '|'.join(cleans[1])
 
   finput.close()
   foutput.close()
