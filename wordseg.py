@@ -8,6 +8,7 @@ import re
 import jieba
 import framework as fw
 import pandas as pd
+import pickle
         
 from pandas import Series, DataFrame
 
@@ -70,7 +71,8 @@ if __name__ == '__main__':
     foutput.write('\n')
 
   cleans = pd.Series(cleans) 
-  print '|'.join(cleans[1])
+  with open('/home/xiziwang/projects/ctr_pred/data/seg_result.pkl','w') as f:
+      pickle.dump(cleans, f) 
 
   finput.close()
   foutput.close()
