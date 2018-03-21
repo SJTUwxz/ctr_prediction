@@ -57,7 +57,7 @@ def process_csv():
             continue
         title = word_div(row[1] ) 
         titles.append(title)
-        if(num< 0.2) :
+        if(num< 0.1) :
             ctr_rate.append(0)
         else:
             ctr_rate.append(1) 
@@ -154,7 +154,7 @@ if __name__ == '__main__':
             embeddings_index[word] = w2vmodel[word]  
         except:
             continue
-    print( 'Loaded {} word vectors.'.format(embeddings_index))
+    # print( 'Loaded {} word vectors.'.format(embeddings_index))
     print ('Load word2vec time: {}'.format(time.time() - t_time ) ) 
     embedding_matrix = np.zeros((vocab_size, 48 ))
     for word, i in t.word_index.items():
@@ -165,10 +165,9 @@ if __name__ == '__main__':
 
     batch_size = 256
     epochs = 20 
-    checkpoint = ModelCheckpoint('/data/users/xiziwang/ctr_data/models/', monitor= 'val_acc', verbose=1, save_best_only =False)
-    progbar = ProgbarLogger() 
-    callback_list = [checkpoint, progbar] 
-    model.fit(padded_docs, train_ctr,epochs=50, verbose=0, callbacks = callback_list)
+    checkpoint = ModelCheckpoint('/data/users/xiziwang/ctr_data/models/ctr-{epoch:02d}-{val_loss:05f}.h5', monitor= 'val_acc', verbose=1, save_best_only =False)
+    callback_list = [checkpoint]  
+    model.fit(padded_docs, train_ctr, epochs=epochs, verbose=1, callbacks = callback_list)
     loss,accuracy = model.evaluate(padded_docs, train_ctr, verbose = 0)
     print( 'Accuracy: %f' % (accuracy * 100) ) 
     
