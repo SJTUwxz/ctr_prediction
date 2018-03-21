@@ -16,12 +16,12 @@ from keras.models import Model
 from keras.layers import Dense, Input, Embedding, Conv2D, MaxPool2D
 from keras.layers import Flatten, Reshape, Concatenate, Dropout, SpatialDropout1D
 from keras.layers.embeddings import Embedding
-from keras.callbacks import Callback
+from keras.callbacks import Callback, ModelCheckpoint, ProgbarLogger
 from gensim.models import Word2Vec
 from sklearn.utils import shuffle
 from sklearn.metrics import roc_auc_score
 
-f = open('../data/stopwords.txt.utf8','r')
+f = open('/data/users/xiziwang/ctr_data/stopwords.txt.utf8','r')
 stopwords = [l.strip() for l in f.readlines()]
 
 def word_div(string):
@@ -42,7 +42,7 @@ def word_div(string):
 
 
 def process_csv():
-    f = '../data/news_quality_dataset_temp_result' 
+    f = '/data/users/xiziwang/ctr_data/news_quality_dataset_temp_result' 
     if os.path.exists(f) == False:
         return False
     table = pd.read_csv(f, delimiter='\x01')
@@ -147,7 +147,7 @@ if __name__ == '__main__':
     t_time = time.time() 
     print 'loading word2vec model'
     
-    w2vmodel = Word2Vec.load( '../data/word2vec.model' )
+    w2vmodel = Word2Vec.load( '/data/users/xiziwang/ctr_data/word2vec.model' )
     
     for word in w2vmodel.wv.vocab:
         try:
@@ -164,9 +164,11 @@ if __name__ == '__main__':
     model = get_model(embedding_matrix = embedding_matrix, max_features = vocab_size)
 
     batch_size = 256
-    epochs = 3
-
-    model.fit(padded_docs, train_ctr,epochs=50, verbose=0)
+    epochs = 20 
+    checkpoint = ModelCheckpoint('/data/users/xiziwang/ctr_data/models/', monitor= 'val_acc', verbose=1, save_best_only =False)
+    progbar = ProgbarLogger() 
+    callback_list = [checkpoint, progbar] 
+    model.fit(padded_docs, train_ctr,epochs=50, verbose=0, callbacks = callback_list)
     loss,accuracy = model.evaluate(padded_docs, train_ctr, verbose = 0)
     print( 'Accuracy: %f' % (accuracy * 100) ) 
     
